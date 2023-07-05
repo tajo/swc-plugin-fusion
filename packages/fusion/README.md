@@ -3,7 +3,7 @@
 #### Setup
 
 ```sh
-npm install --save-dev @swc/plugin-fusion @swc/core
+npm install --save-dev swc-plugin-fusion @swc/core
 ```
 
 Then update your `.swcrc` file like below:
@@ -14,7 +14,7 @@ Then update your `.swcrc` file like below:
     "experimental": {
       "plugins": [
         [
-          "@swc/plugin-fusion",
+          "swc-plugin-fusion",
           {
             "displayName": true,
             "ssr": true

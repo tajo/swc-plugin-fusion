@@ -1,16 +1,6 @@
 [workspace]
 members = [
-  "packages/emotion",
-  "packages/jest",
-  "packages/loadable-components",
-  "packages/fusion",
-  "packages/fusion-asseturl",
-  "packages/fusion-gql",
-  "packages/styled-components",
-  "packages/styled-jsx",
-  "packages/transform-imports",
-  "packages/relay",
-  "packages/noop",
+  "packages/fusion"
 ]
 
 [profile.release]
