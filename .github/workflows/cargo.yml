@@ -1,8 +1,10 @@
 name: Cargo
 
 on:
-  - push
-  - pull_request
+  push:
+    branches: ["main"]
+  pull_request:
+    types: [opened, synchronize]
 
 env:
   RUST_LOG: debug
@@ -38,6 +40,10 @@ jobs:
         with:
           shared-key: "cargo-test"
           cache-on-failure: true
+
+      - name: Run cargo fmt --check
+        run: |
+          cargo fmt --all -- --check
 
       - name: Run cargo test
         run: |
