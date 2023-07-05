@@ -41,6 +41,9 @@ jobs:
           shared-key: "cargo-test"
           cache-on-failure: true
 
+      - name: Install rustfmt
+        run: rustup component add rustfmt
+
       - name: Run cargo fmt --check
         run: |
           cargo fmt --all -- --check
