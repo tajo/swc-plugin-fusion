@@ -12,15 +12,6 @@ env:
   CI: "1"
 
 jobs:
-  format:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v3
-      - uses: dtolnay/rust-toolchain@stable
-      - uses: mbrobbel/rustfmt-check@master
-        with:
-          token: ${{ secrets.GH_TOKEN }}
-
   test:
     strategy:
       fail-fast: false
@@ -49,6 +40,10 @@ jobs:
         with:
           shared-key: "cargo-test"
           cache-on-failure: true
+
+      - name: Run cargo fmt --check
+        run: |
+          cargo fmt --all -- --check
 
       - name: Run cargo test
         run: |
