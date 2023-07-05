@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - main
-      - ci
 
 env:
   RUST_LOG: debug
@@ -14,10 +13,13 @@ jobs:
   build:
     name: Build
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      id-token: write
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v3
         with:
-          submodules: true
+          persist-credentials: false
 
       - name: Setup node
         uses: actions/setup-node@v2
@@ -53,9 +55,15 @@ jobs:
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
 
+      - name: Bump versions
+        shell: bash
+        run: |
+          ./scripts/bump-all.sh
+        env:
+          GH_TOKEN: ${{ secrets.MY_GH_TOKEN }}
+
       - name: Publish npm packages
         run: |
           npm publish --workspaces --access public
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}

@@ -16,8 +16,7 @@ Then update your `.swcrc` file like below:
         [
           "swc-plugin-fusion",
           {
-            "displayName": true,
-            "ssr": true
+            "ssr": false
           }
         ]
       ]

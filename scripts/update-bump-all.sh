@@ -9,10 +9,6 @@ upgradeCargo -p swc_atoms -p swc_common -p testing -p swc_ecmascript -p swc_ecma
 
 git commit -a -m 'Update swc crates' || true
 
-upgradeCargo -p styled_jsx -p modularize_imports -p swc_emotion
-
-git commit -a -m 'Update extra crates' || true
-
 ./scripts/bump-all.sh
 
 # Ensure that Cargo.lock is up-to-date

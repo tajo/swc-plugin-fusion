@@ -154,3 +154,10 @@ _fusionPluginI18nChunkTranslationMap.add(
   ["foo", "test"]
 );
 ```
+
+## Contributing
+
+```sh
+cargo build
+cargo test
+```

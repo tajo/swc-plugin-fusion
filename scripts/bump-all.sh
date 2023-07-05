@@ -1,25 +1,17 @@
 #!/usr/bin/env bash
-set -eu
+set -x
 
-function bumpNpm {
-    (cd $1 && yarn version --no-git-tag-version --patch)
-}
+git config --local --unset-all credential.helper
+git remote remove origin
+git remote add origin https://${GH_TOKEN}@github.com/tajo/swc-plugin-fusion.git
 
-function bumpCargo {
-    cargo mono bump $1 --breaking
-}
+echo "Setting git user.name and user.email to last commit author"
+git config --global user.name "$(git log -n 1 --pretty=format:%an)"
+git config --global user.email "$(git log -n 1 --pretty=format:%ae)"
+(cd ./packages/fusion && npm version patch)
 
-CRATES="$(cargo metadata --format-version 1 \
-    | jq -r '.packages[] | select(.source == null) | .name')"
-
-
-for PKG in ./packages/fusion; do
-    bumpNpm $PKG
-    git commit -a -m "Bump npm package: ${PKG}" || true
-done
-
-for CRATE in $CRATES
-do
-   bumpCargo $CRATE
-   git commit -a -m "Bump cargo crate: ${CRATE}" || true
-done
+git status
+git add .
+git commit -m "Bump npm swc-plugin-fusion"
+git push origin main
+git push origin main --tags

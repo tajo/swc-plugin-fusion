@@ -3,6 +3,10 @@
   "version": "1.0.2",
   "description": "SWC plugin for fusion",
   "main": "plugin_fusion.wasm",
+  "publishConfig": {
+    "access": "public",
+    "provenance": true
+  },
   "scripts": {
     "prepack": "cp ../../target/wasm32-wasi/release/plugin_fusion.wasm ."
   },
