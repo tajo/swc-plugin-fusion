@@ -1,3 +1,5 @@
+use std::rc::Rc;
+
 use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
 use swc_core::{
     common::{errors::HANDLER, FileName, DUMMY_SP},
@@ -6,14 +8,86 @@ use swc_core::{
         visit::{as_folder, noop_visit_mut_type, Fold, VisitMut},
     },
 };
+use tracing::debug;
 
-pub fn split(file_name: FileName) -> impl VisitMut + Fold {
-    as_folder(SplitVisitor { file_name })
+use crate::Config;
+
+pub fn split(config: Rc<Config>, file_name: FileName) -> impl VisitMut + Fold {
+    as_folder(SplitVisitor { config, file_name })
+}
+
+fn get_member_props(module_id: String, ssr: bool) -> Vec<PropOrSpread> {
+    let mut member_props = vec![
+        PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+            key: PropName::Ident(Ident::new("__CHUNK_IDS".into(), DUMMY_SP)),
+            value: Box::new(Expr::Object(ObjectLit {
+                span: DUMMY_SP,
+                props: vec![PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+                    key: PropName::Ident(Ident::new("value".into(), DUMMY_SP)),
+                    value: Box::new(Expr::Array(ArrayLit {
+                        span: DUMMY_SP,
+                        elems: vec![],
+                    })),
+                })))],
+            })),
+        }))),
+        PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+            key: PropName::Ident(Ident::new("__MODULE_ID".into(), DUMMY_SP)),
+            value: Box::new(Expr::Object(ObjectLit {
+                span: DUMMY_SP,
+                props: vec![PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+                    key: PropName::Ident(Ident::new("value".into(), DUMMY_SP)),
+                    value: Box::new(Expr::Lit(Lit::Str(Str {
+                        span: DUMMY_SP,
+                        value: module_id.clone().into(),
+                        raw: Default::default(),
+                    }))),
+                })))],
+            })),
+        }))),
+    ];
+    if ssr {
+        member_props.push(PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+            key: PropName::Ident(Ident::new(
+                "__FUSION_DYNAMIC_IMPORT_METADATA__".into(),
+                DUMMY_SP,
+            )),
+            value: Box::new(Expr::Object(ObjectLit {
+                span: DUMMY_SP,
+                props: vec![PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+                    key: PropName::Ident(Ident::new("value".into(), DUMMY_SP)),
+                    value: Box::new(Expr::Object(ObjectLit {
+                        span: DUMMY_SP,
+                        props: vec![
+                            PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+                                key: PropName::Ident(Ident::new("version".into(), DUMMY_SP)),
+                                value: Box::new(Expr::Lit(Lit::Num(Number {
+                                    span: DUMMY_SP,
+                                    value: 0.0,
+                                    raw: Default::default(),
+                                }))),
+                            }))),
+                            PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
+                                key: PropName::Ident(Ident::new("moduleId".into(), DUMMY_SP)),
+                                value: Box::new(Expr::Lit(Lit::Str(Str {
+                                    span: DUMMY_SP,
+                                    value: module_id.clone().into(),
+                                    raw: Default::default(),
+                                }))),
+                            }))),
+                        ],
+                    })),
+                })))],
+            })),
+        }))));
+    }
+    return member_props;
 }
 
 #[derive(Debug)]
 struct SplitVisitor {
     file_name: FileName,
+    config: Rc<Config>,
 }
 
 impl VisitMut for SplitVisitor {
@@ -74,68 +148,12 @@ impl VisitMut for SplitVisitor {
                                     encoded_import
                                 );
 
+                                debug!("config: {:?}", self.config);
+
                                 let obj_lit = Expr::Object(ObjectLit {
-                                                span: DUMMY_SP,
-                                                props: vec![
-                                                    PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                        key: PropName::Ident(Ident::new("__CHUNK_IDS".into(), DUMMY_SP)),
-                                                        value: Box::new(Expr::Object(ObjectLit {
-                                                            span: DUMMY_SP,
-                                                            props: vec![PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                                key: PropName::Ident(Ident::new("value".into(), DUMMY_SP)),
-                                                                value: Box::new(Expr::Array(ArrayLit {
-                                                                    span: DUMMY_SP,
-                                                                    elems: vec![],
-                                                                })),
-                                                            })))],
-                                                        })),
-                                                    }))),
-                                                    PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                        key: PropName::Ident(Ident::new("__MODULE_ID".into(), DUMMY_SP)),
-                                                        value: Box::new(Expr::Object(ObjectLit {
-                                                            span: DUMMY_SP,
-                                                            props: vec![PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                                key: PropName::Ident(Ident::new("value".into(), DUMMY_SP)),
-                                                                value: Box::new(Expr::Lit(Lit::Str(Str {
-                                                                    span: DUMMY_SP,
-                                                                    value: module_id.clone().into(),
-                                                                    raw: Default::default(),
-                                                                }))),
-                                                            })))],
-                                                        })),
-                                                    }))),
-                                                    PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                        key: PropName::Ident(Ident::new("__FUSION_DYNAMIC_IMPORT_METADATA__".into(), DUMMY_SP)),
-                                                        value: Box::new(Expr::Object(ObjectLit {
-                                                            span: DUMMY_SP,
-                                                            props: vec![PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                                key: PropName::Ident(Ident::new("value".into(), DUMMY_SP)),
-                                                                value: Box::new(Expr::Object(ObjectLit {
-                                                                    span: DUMMY_SP,
-                                                                    props: vec![
-                                                                        PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                                            key: PropName::Ident(Ident::new("version".into(), DUMMY_SP)),
-                                                                            value: Box::new(Expr::Lit(Lit::Num(Number {
-                                                                                span: DUMMY_SP,
-                                                                                value: 0.0,
-                                                                                raw: Default::default(),
-                                                                            }))),
-                                                                        }))),
-                                                                        PropOrSpread::Prop(Box::new(Prop::KeyValue(KeyValueProp {
-                                                                            key: PropName::Ident(Ident::new("moduleId".into(), DUMMY_SP)),
-                                                                            value: Box::new(Expr::Lit(Lit::Str(Str {
-                                                                                span: DUMMY_SP,
-                                                                                value: module_id.clone().into(),
-                                                                                raw: Default::default(),
-                                                                            }))),
-                                                                        }))),
-                                                                    ],
-                                                                })),
-                                                            })))],
-                                                        })),
-                                                    }))),
-                                                ],
-                                            });
+                                    span: DUMMY_SP,
+                                    props: get_member_props(module_id, self.config.ssr.into()),
+                                });
 
                                 let new_args = vec![
                                     ExprOrSpread {

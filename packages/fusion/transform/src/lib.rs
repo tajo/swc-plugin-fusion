@@ -57,11 +57,11 @@ fn true_by_default() -> bool {
 
 impl Config {}
 
-pub fn i18n_macro(file_name: FileName) -> impl Fold + VisitMut {
+pub fn i18n_macro(config: Config, file_name: FileName) -> impl Fold + VisitMut {
     let state: Rc<RefCell<i18n_state>> = Default::default();
-
+    let config = Rc::new(config);
     chain!(
-        i18n_analyze_imports(state.clone()),
+        i18n_analyze_imports(config.clone(), state.clone()),
         i18n_analyze_use_translation(state.clone()),
         i18n_report_ids(file_name.clone(), state)
     )
@@ -70,7 +70,6 @@ pub fn i18n_macro(file_name: FileName) -> impl Fold + VisitMut {
 pub fn asseturl_macro(config: Config) -> impl Fold + VisitMut {
     let state: Rc<RefCell<asseturlState>> = Default::default();
     let config = Rc::new(config);
-
     chain!(
         asseturlAnalyzer(config.clone(), state.clone()),
         asseturl(state)
@@ -80,7 +79,6 @@ pub fn asseturl_macro(config: Config) -> impl Fold + VisitMut {
 pub fn gql_macro(config: Config) -> impl Fold + VisitMut {
     let state: Rc<RefCell<gqlState>> = Default::default();
     let config = Rc::new(config);
-
     chain!(gqlAnalyzer(config.clone(), state.clone()), gql(state))
 }
 
@@ -88,6 +86,7 @@ pub fn dirname_macro(file_name: FileName) -> impl Fold + VisitMut {
     dirname(file_name)
 }
 
-pub fn split_macro(file_name: FileName) -> impl Fold + VisitMut {
-    split(file_name)
+pub fn split_macro(config: Config, file_name: FileName) -> impl Fold + VisitMut {
+    let config = Rc::new(config);
+    split(config.clone(), file_name)
 }

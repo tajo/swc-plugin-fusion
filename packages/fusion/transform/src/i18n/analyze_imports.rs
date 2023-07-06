@@ -12,12 +12,14 @@ use swc_core::{
 use tracing::debug;
 
 use super::State;
+use crate::Config;
 
-pub fn i18n_analyze_imports(state: Rc<RefCell<State>>) -> impl VisitMut + Fold {
-    as_folder(AsAnalyzer { state })
+pub fn i18n_analyze_imports(config: Rc<Config>, state: Rc<RefCell<State>>) -> impl VisitMut + Fold {
+    as_folder(AsAnalyzer { config, state })
 }
 
 struct AsAnalyzer {
+    config: Rc<Config>,
     state: Rc<RefCell<State>>,
 }
 
@@ -26,6 +28,7 @@ impl VisitMut for AsAnalyzer {
 
     fn visit_mut_module(&mut self, p: &mut Module) {
         let mut v: Analyzer<'_> = Analyzer {
+            config: &self.config,
             state: &mut self.state.borrow_mut(),
         };
 
@@ -34,6 +37,7 @@ impl VisitMut for AsAnalyzer {
 
     fn visit_mut_script(&mut self, p: &mut Script) {
         let mut v = Analyzer {
+            config: &self.config,
             state: &mut self.state.borrow_mut(),
         };
 
@@ -83,6 +87,7 @@ pub fn find_id_attribute(opening_element: &JSXOpeningElement) -> Option<String> 
 }
 
 struct Analyzer<'a> {
+    config: &'a Config,
     state: &'a mut State,
 }
 
@@ -147,7 +152,14 @@ impl Visit for Analyzer<'_> {
     }
 
     fn visit_import_decl(&mut self, i: &ImportDecl) {
-        if &*i.src.value == "fusion-plugin-i18n-react" {
+        let is_i18n = if self.config.top_level_import_paths.is_empty() {
+            &*i.src.value == "fusion-plugin-i18n-react"
+                || i.src.value.starts_with("fusion-plugin-i18n-react/")
+        } else {
+            self.config.top_level_import_paths.contains(&i.src.value)
+        };
+
+        if is_i18n {
             for s in &i.specifiers {
                 match s {
                     ImportSpecifier::Named(s) => {
