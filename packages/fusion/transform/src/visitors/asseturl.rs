@@ -31,13 +31,8 @@ use tracing::{
 
 use crate::{asseturl_utils::State, shared::converters::JsVarConverter};
 
-pub fn asseturl(
-    // file_name: FileName,
-    // src_file_hash: u128,
-    // config: Rc<Config>,
-    state: Rc<RefCell<State>>,
-) -> impl Fold + VisitMut {
-    as_folder(DisplayNameAndId {
+pub fn asseturl(state: Rc<RefCell<State>>) -> impl Fold + VisitMut {
+    as_folder(AsseturlVisitor {
         state,
         to_prepend: BTreeSet::new(),
         converter: JsVarConverter::new("asseturl"),
@@ -46,18 +41,17 @@ pub fn asseturl(
 
 #[derive(Debug, PartialEq, Hash, Eq, Ord, PartialOrd)]
 struct Thing {
-    // ident: Ident,
     file_path: String,
 }
 
 #[derive(Debug)]
-struct DisplayNameAndId {
+struct AsseturlVisitor {
     state: Rc<RefCell<State>>,
     to_prepend: BTreeSet<Thing>,
     converter: JsVarConverter,
 }
 
-impl DisplayNameAndId {
+impl AsseturlVisitor {
     fn replace_asseturl_call(&mut self, expr: &mut Expr) {
         if let Expr::Call(call_expr) = expr {
             if let Callee::Expr(callee) = &call_expr.callee {
@@ -86,7 +80,7 @@ impl DisplayNameAndId {
     }
 }
 
-impl VisitMut for DisplayNameAndId {
+impl VisitMut for AsseturlVisitor {
     noop_visit_mut_type!();
 
     fn visit_mut_module(&mut self, n: &mut Module) {
