@@ -45,6 +45,10 @@ fn fusion_asseturl(mut program: Program, data: TransformPluginProgramMetadata) -
 
     program.visit_mut_with(&mut pass);
 
+    let mut pass = fusion::split_macro(file_name.clone());
+
+    program.visit_mut_with(&mut pass);
+
     debug!("Running i18n macro");
 
     let mut pass = fusion::i18n_macro(file_name.clone());

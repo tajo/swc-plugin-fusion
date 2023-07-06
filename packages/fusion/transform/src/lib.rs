@@ -15,7 +15,9 @@ pub use crate::{
     asseturl_utils::{analyzer as asseturlAnalyzer, State as asseturlState},
     gql_utils::{analyzer as gqlAnalyzer, State as gqlState},
     i18n::{i18n_analyze_imports, i18n_analyze_use_translation, State as i18n_state},
-    visitors::{asseturl::asseturl, dirname::dirname, gql::gql, i18n::i18n_report_ids},
+    visitors::{
+        asseturl::asseturl, dirname::dirname, gql::gql, i18n::i18n_report_ids, split::split,
+    },
 };
 
 mod asseturl_utils;
@@ -96,8 +98,9 @@ pub fn gql_macro(config: Config) -> impl Fold + VisitMut {
 }
 
 pub fn dirname_macro(file_name: FileName) -> impl Fold + VisitMut {
-    // let state: Rc<RefCell<gqlState>> = Default::default();
-    // let config = Rc::new(config);
-
     dirname(file_name)
+}
+
+pub fn split_macro(file_name: FileName) -> impl Fold + VisitMut {
+    split(file_name)
 }
