@@ -10,15 +10,15 @@ use swc_core::{
 use tracing::debug;
 
 pub fn dirname(file_name: FileName) -> impl VisitMut + Fold {
-    as_folder(DisplayNameAndId { file_name })
+    as_folder(DirnameVisitor { file_name })
 }
 
 #[derive(Debug)]
-struct DisplayNameAndId {
+struct DirnameVisitor {
     file_name: FileName,
 }
 
-impl VisitMut for DisplayNameAndId {
+impl VisitMut for DirnameVisitor {
     noop_visit_mut_type!();
 
     fn visit_mut_expr(&mut self, expr: &mut Expr) {

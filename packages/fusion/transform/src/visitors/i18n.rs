@@ -13,16 +13,16 @@ use tracing::debug;
 use crate::i18n::State;
 
 pub fn i18n_report_ids(file_name: FileName, state: Rc<RefCell<State>>) -> impl Fold + VisitMut {
-    as_folder(DisplayNameAndId { file_name, state })
+    as_folder(I18nVisitor { file_name, state })
 }
 
 #[derive(Debug)]
-struct DisplayNameAndId {
+struct I18nVisitor {
     file_name: FileName,
     state: Rc<RefCell<State>>,
 }
 
-impl VisitMut for DisplayNameAndId {
+impl VisitMut for I18nVisitor {
     noop_visit_mut_type!();
 
     fn visit_mut_module(&mut self, n: &mut Module) {

@@ -8,15 +8,15 @@ use swc_core::{
 };
 
 pub fn split(file_name: FileName) -> impl VisitMut + Fold {
-    as_folder(DisplayNameAndId { file_name })
+    as_folder(SplitVisitor { file_name })
 }
 
 #[derive(Debug)]
-struct DisplayNameAndId {
+struct SplitVisitor {
     file_name: FileName,
 }
 
-impl VisitMut for DisplayNameAndId {
+impl VisitMut for SplitVisitor {
     noop_visit_mut_type!();
 
     fn visit_mut_call_expr(&mut self, call_expr: &mut CallExpr) {
