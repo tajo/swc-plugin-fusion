@@ -2,7 +2,7 @@
 
 use std::{fs::read_to_string, path::PathBuf};
 
-use fusion::{asseturl_macro, dirname_macro, gql_macro, i18n_macro, Config};
+use fusion::{asseturl_macro, dirname_macro, gql_macro, i18n_macro, split_macro, Config};
 use swc_core::{
     common::{chain, FileName, Mark},
     ecma::{
@@ -29,6 +29,7 @@ fn fixture(input: PathBuf) {
                 asseturl_macro(config.clone()),
                 gql_macro(config.clone()),
                 dirname_macro(FileName::Real(PathBuf::from("/path/to/file.js"))),
+                split_macro(FileName::Real(PathBuf::from("/path/to/file.js"))),
                 i18n_macro(FileName::Real(PathBuf::from("/path/to/file.js"))),
             )
         },
