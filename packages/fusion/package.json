@@ -1,6 +1,6 @@
 {
   "name": "swc-plugin-fusion",
-  "version": "1.0.8",
+  "version": "1.0.9",
   "description": "SWC plugin for fusion",
   "main": "plugin_fusion.wasm",
   "publishConfig": {
