@@ -1,0 +1,18 @@
+{
+  "name": "fusion-js-test",
+  "version": "0.0.0",
+  "description": "JS tests for swc-plugin-fusion",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "test": "../../scripts/build-all.sh && node fixture.js"
+  },
+  "author": "Vojtech Miksu <vojtech@uber.com>",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@swc/core": "^1.3.58",
+    "colors": "^1.4.0",
+    "diff": "^5.1.0",
+    "prettier": "^2.8.7"
+  }
+}

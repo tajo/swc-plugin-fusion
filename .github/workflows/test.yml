@@ -26,6 +26,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -47,3 +50,12 @@ jobs:
       - name: Run cargo test
         run: |
           cargo test --all --color always
+
+      - name: Install wasm target
+        shell: bash
+        run: |
+          rustup target add wasm32-wasi
+
+      - name: Build binary and run JS tests
+        run: |
+          npm test -w fusion-js-test

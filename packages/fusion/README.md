@@ -1,6 +1,6 @@
-### `@swc/plugin-fusion`
+# swc-plugin-fusion
 
-#### Setup
+## Setup
 
 ```sh
 npm install --save-dev swc-plugin-fusion @swc/core
@@ -16,7 +16,13 @@ Then update your `.swcrc` file like below:
         [
           "swc-plugin-fusion",
           {
-            "ssr": false
+            "ssr": true,
+            "transformAsseturl": true,
+            "transformGql": true,
+            "transformI18n": true,
+            "transformSplit": true,
+            "transformDirname": true,
+            "topLevelImportPaths": []
           }
         ]
       ]

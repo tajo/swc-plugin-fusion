@@ -155,6 +155,33 @@ _fusionPluginI18nChunkTranslationMap.add(
 );
 ```
 
+### split dynamic imports
+
+```js
+import("./foo/baz");
+```
+
+into
+
+```js
+Object.defineProperties(import("./foo/baz"), {
+  __CHUNK_IDS: {
+    value: [],
+  },
+  __MODULE_ID: {
+    value:
+      "virtual:fusion-vite-split-loader?importer=file.js&specifier=%2E%2Ffoo%2Fbaz",
+  },
+  __FUSION_DYNAMIC_IMPORT_METADATA__: {
+    value: {
+      version: 0,
+      moduleId:
+        "virtual:fusion-vite-split-loader?importer=file.js&specifier=%2E%2Ffoo%2Fbaz",
+    },
+  },
+});
+```
+
 ## Contributing
 
 ```sh
