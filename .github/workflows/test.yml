@@ -26,6 +26,9 @@ jobs:
         with:
           node-version: 18
 
+      - name: Install dependencies
+        run: npm install
+
       - name: Install Rust
         uses: actions-rs/toolchain@v1
         with:
@@ -47,3 +50,7 @@ jobs:
       - name: Run cargo test
         run: |
           cargo test --all --color always
+
+      - name: Run JS tests
+        run: |
+          npm test -w fusion-js-test

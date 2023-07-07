@@ -5,7 +5,7 @@
   "type": "module",
   "private": true,
   "scripts": {
-    "test": "node fixture.js"
+    "test": "../../scripts/build-all.sh && node fixture.js"
   },
   "author": "Vojtech Miksu <vojtech@uber.com>",
   "license": "Apache-2.0",

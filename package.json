@@ -3,5 +3,9 @@
   "private": true,
   "workspaces": [
     "packages/*"
-  ]
+  ],
+  "dependencies": {
+    "@babel/core": "^7.22.8",
+    "@babel/preset-react": "^7.22.5"
+  }
 }

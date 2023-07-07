@@ -5,13 +5,8 @@ export default function () {
   translate("static");
   translate(`prefix.${"foo"}.mid.${"baz"}`);
 }
-_fusionPluginI18nChunkTranslationMap.add("/path/to/file.js", [
-    "vite-i18n-chunk"
-], [
-    "static",
-    [
-      "prefix.",
-      ".mid.",
-      ""
-    ]
-]);
+_fusionPluginI18nChunkTranslationMap.add(
+  "/path/to/file.js",
+  ["vite-i18n-chunk"],
+  ["static", ["prefix.", ".mid.", ""]]
+);
