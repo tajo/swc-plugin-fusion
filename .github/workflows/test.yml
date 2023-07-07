@@ -51,6 +51,11 @@ jobs:
         run: |
           cargo test --all --color always
 
-      - name: Run JS tests
+      - name: Install wasm target
+        shell: bash
+        run: |
+          rustup target add wasm32-wasi
+
+      - name: Build binary and run JS tests
         run: |
           npm test -w fusion-js-test
