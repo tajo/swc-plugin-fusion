@@ -22,7 +22,7 @@ fn chain_plugins(plugins: Vec<Box<dyn FoldVisitMut + 'static>>) -> Box<dyn FoldV
         .expect("Expected at least one plugin")
 }
 
-#[testing::fixture("tests/fixtures/**/code.js")]
+#[testing::fixture("../../../fixtures/**/code.js")]
 fn fixture(input: PathBuf) {
     let dir = input.parent().unwrap();
     let config = read_to_string(dir.join("config.json")).expect("failed to read config.json");
