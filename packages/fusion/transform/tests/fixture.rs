@@ -4,10 +4,10 @@ use std::{fs::read_to_string, path::PathBuf};
 
 use fusion::{asseturl_macro, dirname_macro, gql_macro, i18n_macro, split_macro, Config};
 use swc_core::{
-    common::{chain, FileName, Mark},
+    common::{chain, FileName},
     ecma::{
         parser::{EsConfig, Syntax},
-        transforms::{base::resolver, testing::test_fixture},
+        transforms::{testing::test_fixture},
         visit::{Fold, VisitMut},
     },
 };
@@ -37,7 +37,6 @@ fn fixture(input: PathBuf) {
         }),
         &|_| {
             let mut plugins: Vec<Box<dyn FoldVisitMut + 'static>> = Vec::new();
-            plugins.push(Box::new(resolver(Mark::new(), Mark::new(), false)));
             if config.transform_asseturl {
                 plugins.push(Box::new(asseturl_macro(config.clone())));
             }
