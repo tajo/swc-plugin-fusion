@@ -7,7 +7,7 @@ use swc_core::{
     common::{chain, FileName},
     ecma::{
         parser::{EsConfig, Syntax},
-        transforms::{testing::test_fixture},
+        transforms::testing::test_fixture,
         visit::{Fold, VisitMut},
     },
 };
