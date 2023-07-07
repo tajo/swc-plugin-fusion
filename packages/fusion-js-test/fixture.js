@@ -88,7 +88,7 @@ const run = async () => {
           `console.log(""); // __dirname`,
           `console.log("/path/to"); // __dirname`
         )
-        // .replace(/code%2Ejs/g, "%2Fpath%2Fto%2Ffile%2Ejs")
+        .replace(/code%2Ejs/g, "%2Fpath%2Fto%2Ffile%2Ejs")
         .replace(/code\.js/g, "/path/to/file.js");
       result = await format(result, { parser: "babel" });
 
