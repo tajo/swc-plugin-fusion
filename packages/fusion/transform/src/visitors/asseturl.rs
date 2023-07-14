@@ -94,6 +94,13 @@ impl VisitMut for AsseturlVisitor {
                 local: new_ident,
             });
 
+            let initial_src_value: String = i.file_path.clone().into();
+            let src_value = if initial_src_value.ends_with(".css") {
+                format!("{}?inline", initial_src_value)
+            } else {
+                initial_src_value
+            };
+
             prepend_stmt(
                 &mut n.body,
                 ModuleItem::ModuleDecl(ModuleDecl::Import(ImportDecl {
@@ -101,7 +108,7 @@ impl VisitMut for AsseturlVisitor {
                     specifiers: vec![specifier],
                     src: Box::new(Str {
                         span: DUMMY_SP,
-                        value: i.file_path.clone().into(),
+                        value: src_value.into(),
                         raw: None,
                     }),
                     type_only: Default::default(),
