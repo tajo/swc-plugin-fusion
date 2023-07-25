@@ -49,10 +49,7 @@ impl Visit for Analyzer<'_> {
     noop_visit_type!();
 
     fn visit_var_declarator(&mut self, var_declarator: &VarDeclarator) {
-        debug!(
-            "use_translation_run: {:?}",
-            var_declarator.init.as_ref().unwrap()
-        );
+        debug!("use_translation_run: {:?}", var_declarator);
         debug!("state: {:?}", self.state);
     }
 

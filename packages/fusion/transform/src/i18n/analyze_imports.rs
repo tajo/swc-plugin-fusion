@@ -91,20 +91,13 @@ struct Analyzer<'a> {
     state: &'a mut State,
 }
 
-fn get_var_name(var_declarator: &VarDeclarator) -> Result<String, String> {
+fn get_var_name(var_declarator: &VarDeclarator) -> Option<String> {
     match &var_declarator.name {
         Pat::Ident(binding_ident) => {
             let name = binding_ident.id.sym.as_ref().to_owned();
-            Ok(name)
+            Some(name)
         }
-        _ => {
-            HANDLER.with(|handler| {
-                handler.err(&format!(
-                    "var_declarator.name in foo = useTranslations() is not Pat::Ident"
-                ));
-            });
-            Err("__err".into())
-        }
+        _ => None,
     }
 }
 
@@ -112,21 +105,23 @@ impl Visit for Analyzer<'_> {
     noop_visit_type!();
 
     fn visit_var_declarator(&mut self, var_declarator: &VarDeclarator) {
-        let name = get_var_name(var_declarator).unwrap();
-        let init_val = var_declarator.init.as_ref().unwrap();
-        match &**init_val {
-            Expr::Call(call_expr) => match &call_expr.callee {
-                Callee::Expr(boxed_expr) => match &**boxed_expr {
-                    Expr::Ident(ident) => {
-                        if ident.sym.as_ref() == "useTranslations" {
-                            self.state.add_use_translation_alias(name);
-                        }
-                    }
+        if let Some(name) = get_var_name(var_declarator) {
+            if let Some(init_val) = var_declarator.init.as_ref() {
+                match &**init_val {
+                    Expr::Call(call_expr) => match &call_expr.callee {
+                        Callee::Expr(boxed_expr) => match &**boxed_expr {
+                            Expr::Ident(ident) => {
+                                if ident.sym.as_ref() == "useTranslations" {
+                                    self.state.add_use_translation_alias(name);
+                                }
+                            }
+                            _ => (),
+                        },
+                        _ => (),
+                    },
                     _ => (),
-                },
-                _ => (),
-            },
-            _ => (),
+                }
+            }
         }
     }
 
