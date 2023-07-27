@@ -95,11 +95,7 @@ impl VisitMut for AsseturlVisitor {
             });
 
             let initial_src_value: String = i.file_path.clone().into();
-            let src_value = if initial_src_value.ends_with(".css") {
-                format!("{}?inline", initial_src_value)
-            } else {
-                initial_src_value
-            };
+            let src_value = format!("{}?url", initial_src_value);
 
             prepend_stmt(
                 &mut n.body,

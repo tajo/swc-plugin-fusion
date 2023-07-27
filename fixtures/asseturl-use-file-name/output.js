@@ -1,7 +1,7 @@
-import $_asseturl___styles_css3 from "./styles.css?inline";
-import $_asseturl___foo_bar_jpg2 from "./foo@bar.jpg";
-import $_asseturl___foo_jpg0 from "./foo.jpg";
-import $_asseturl___foo_bar_jpg1 from "./foo-bar.jpg";
+import $_asseturl___styles_css3 from "./styles.css?url";
+import $_asseturl___foo_bar_jpg2 from "./foo@bar.jpg?url";
+import $_asseturl___foo_jpg0 from "./foo.jpg?url";
+import $_asseturl___foo_bar_jpg1 from "./foo-bar.jpg?url";
 import { assetUrl } from "fusion-core";
 const Test = $_asseturl___foo_jpg0;
 const Test2 = $_asseturl___foo_bar_jpg1;
