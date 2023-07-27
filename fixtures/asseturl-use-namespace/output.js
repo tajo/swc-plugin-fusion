@@ -1,8 +1,8 @@
-import $_asseturl___src_e_jpg4 from "./src/e.jpg";
-import $_asseturl___d_png3 from "./d.png";
-import $_asseturl___c_gif2 from "./c.gif";
-import $_asseturl___b_jpg1 from "./b.jpg";
-import $_asseturl___a_png0 from "./a.png";
+import $_asseturl___src_e_jpg4 from "./src/e.jpg?url";
+import $_asseturl___d_png3 from "./d.png?url";
+import $_asseturl___c_gif2 from "./c.gif?url";
+import $_asseturl___b_jpg1 from "./b.jpg?url";
+import $_asseturl___a_png0 from "./a.png?url";
 import { assetUrl as testUrl } from "fusion-core";
 const a = $_asseturl___a_png0;
 const b = $_asseturl___b_jpg1;
