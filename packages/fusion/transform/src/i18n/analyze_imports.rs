@@ -105,6 +105,7 @@ impl Visit for Analyzer<'_> {
     noop_visit_type!();
 
     fn visit_var_declarator(&mut self, var_declarator: &VarDeclarator) {
+        var_declarator.visit_children_with(self);
         if let Some(name) = get_var_name(var_declarator) {
             if let Some(init_val) = var_declarator.init.as_ref() {
                 match &**init_val {
