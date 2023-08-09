@@ -1,1 +1,1 @@
-import('./foo/baz')
+split(import('./foo/baz'))
