@@ -59,7 +59,7 @@ const run = async () => {
       let result = (
         await transform(code, {
           isModule: true,
-          filename: "code.js",
+          filename: "/path/to/file.js",
           jsc: {
             target: "esnext",
             experimental: {
@@ -81,15 +81,6 @@ const run = async () => {
           },
         })
       ).code;
-      // manually fixing some differences caused by __dirname and __filename being different
-      // in the test environment
-      result = result
-        .replace(
-          `console.log(""); // __dirname`,
-          `console.log("/path/to"); // __dirname`
-        )
-        .replace(/code%2Ejs/g, "%2Fpath%2Fto%2Ffile%2Ejs")
-        .replace(/code\.js/g, "/path/to/file.js");
       result = await format(result, { parser: "babel" });
 
       if (result != output) {
