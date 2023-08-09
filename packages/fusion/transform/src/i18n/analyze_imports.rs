@@ -127,6 +127,7 @@ impl Visit for Analyzer<'_> {
     }
 
     fn visit_jsx_opening_element(&mut self, opening_element: &JSXOpeningElement) {
+        opening_element.visit_children_with(self);
         match &opening_element.name {
             JSXElementName::Ident(ident) => {
                 if self
