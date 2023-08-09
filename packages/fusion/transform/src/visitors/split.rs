@@ -1,6 +1,6 @@
 use std::rc::Rc;
 
-use percent_encoding::{utf8_percent_encode, NON_ALPHANUMERIC};
+use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 use swc_core::{
     common::{errors::HANDLER, FileName, DUMMY_SP},
     ecma::{
@@ -15,6 +15,25 @@ use crate::Config;
 pub fn split(config: Rc<Config>, file_name: FileName) -> impl VisitMut + Fold {
     as_folder(SplitVisitor { config, file_name })
 }
+
+// https://url.spec.whatwg.org/#query-percent-encode-set
+const QUERY: &AsciiSet = &CONTROLS.add(b' ').add(b'"').add(b'#').add(b'<').add(b'>');
+// https://url.spec.whatwg.org/#path-percent-encode-set
+const PATH: &AsciiSet = &QUERY.add(b'?').add(b'`').add(b'{').add(b'}');
+// https://url.spec.whatwg.org/#userinfo-percent-encode-set
+const USERINFO: &AsciiSet = &PATH
+    .add(b'/')
+    .add(b':')
+    .add(b';')
+    .add(b'=')
+    .add(b'@')
+    .add(b'[')
+    .add(0x005c)
+    .add(0x005d)
+    .add(b'^')
+    .add(b'|');
+// https://url.spec.whatwg.org/#component-percent-encode-set
+const COMPONENT: &AsciiSet = &USERINFO.add(b'$').add(0x0025).add(b'&').add(b'+').add(b',');
 
 fn get_member_props(module_id: String, ssr: bool) -> Vec<PropOrSpread> {
     let mut member_props = vec![
@@ -128,15 +147,13 @@ impl VisitMut for SplitVisitor {
                                     type_args: Default::default(),
                                 });
 
-                                let encoded_file_name = utf8_percent_encode(
-                                    &self.file_name.to_string(),
-                                    NON_ALPHANUMERIC,
-                                )
-                                .to_string();
+                                let encoded_file_name =
+                                    utf8_percent_encode(&self.file_name.to_string(), COMPONENT)
+                                        .to_string();
 
                                 let encoded_import = utf8_percent_encode(
                                     &lit_str.value.clone().to_string(),
-                                    NON_ALPHANUMERIC,
+                                    COMPONENT,
                                 )
                                 .to_string();
 
@@ -190,5 +207,17 @@ impl VisitMut for SplitVisitor {
             },
             _ => (),
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    #[test]
+    fn test_encode_uri_component() {
+        assert_eq!(
+            utf8_percent_encode("!@#$%^&*()-_+={}[]\\|'\";:+ ,.<>?/~`", COMPONENT,).to_string(),
+            "!%40%23%24%25%5E%26*()-_%2B%3D%7B%7D%5B%5D%5C%7C'%22%3B%3A%2B%20%2C.%3C%3E%3F%2F~%60"
+        );
     }
 }
