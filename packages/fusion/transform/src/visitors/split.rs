@@ -5,7 +5,7 @@ use swc_core::{
     common::{errors::HANDLER, FileName, DUMMY_SP},
     ecma::{
         ast::*,
-        visit::{as_folder, noop_visit_mut_type, Fold, VisitMut},
+        visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
     },
 };
 use tracing::debug;
@@ -113,6 +113,7 @@ impl VisitMut for SplitVisitor {
     noop_visit_mut_type!();
 
     fn visit_mut_call_expr(&mut self, call_expr: &mut CallExpr) {
+        call_expr.visit_mut_children_with(self);
         match &call_expr.callee {
             Callee::Import(_) => match call_expr.args.first() {
                 Some(arg) => match arg {
