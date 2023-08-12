@@ -183,6 +183,7 @@ impl Visit for Analyzer<'_> {
     }
 
     fn visit_call_expr(&mut self, call_expr: &CallExpr) {
+        call_expr.visit_children_with(self);
         let error_msg = "The withTranslations hoc must be called with an array of string literal \
                          translation keys.";
         match &call_expr.callee {
