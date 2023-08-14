@@ -188,43 +188,37 @@ impl Visit for Analyzer<'_> {
                          translation keys.";
         match &call_expr.callee {
             Callee::Expr(boxed_expr) => match &**boxed_expr {
-                Expr::Call(inner_call_expr) => match &inner_call_expr.callee {
-                    Callee::Expr(inner_boxed_expr) => match &**inner_boxed_expr {
-                        Expr::Ident(ident) => {
-                            if self
-                                .state
-                                .get_fusion_plugin_imports()
-                                .contains(ident.sym.as_ref())
-                            {
-                                debug!("withTranslations call matched");
-                                if let Some(first_arg) = inner_call_expr.args.get(0) {
-                                    match &*first_arg.expr {
-                                        Expr::Array(array_lit) => {
-                                            for elem in &array_lit.elems {
-                                                if let Some(ExprOrSpread { expr, .. }) = elem {
-                                                    if let Expr::Lit(Lit::Str(str_lit)) = &**expr {
-                                                        self.state.add_translation_id(
-                                                            str_lit.value.as_ref().to_owned(),
-                                                        );
-                                                    } else {
-                                                        HANDLER.with(|handler| {
-                                                            handler.err(error_msg);
-                                                        });
-                                                    }
-                                                }
+                Expr::Ident(ident) => {
+                    if self
+                        .state
+                        .get_fusion_plugin_imports()
+                        .contains(ident.sym.as_ref())
+                    {
+                        debug!("withTranslations call matched");
+                        if let Some(first_arg) = call_expr.args.get(0) {
+                            match &*first_arg.expr {
+                                Expr::Array(array_lit) => {
+                                    for elem in &array_lit.elems {
+                                        if let Some(ExprOrSpread { expr, .. }) = elem {
+                                            if let Expr::Lit(Lit::Str(str_lit)) = &**expr {
+                                                self.state.add_translation_id(
+                                                    str_lit.value.as_ref().to_owned(),
+                                                );
+                                            } else {
+                                                HANDLER.with(|handler| {
+                                                    handler.err(error_msg);
+                                                });
                                             }
                                         }
-                                        _ => HANDLER.with(|handler| {
-                                            handler.err(error_msg);
-                                        }),
                                     }
                                 }
+                                _ => HANDLER.with(|handler| {
+                                    handler.err(error_msg);
+                                }),
                             }
                         }
-                        _ => {}
-                    },
-                    _ => {}
-                },
+                    }
+                }
                 _ => {}
             },
             _ => {}

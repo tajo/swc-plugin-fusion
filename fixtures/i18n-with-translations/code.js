@@ -7,3 +7,9 @@ export default withTranslations(['test', 'foo'])(({ translate }) => {
 export const Baz = compose(withReducer(baz), withTranslations(['bar'])(({ translate }) => {
   return <input placeholder={translate('bar')} />;
 }));
+
+export const Qux = compose(
+  withTranslations([
+    'qux',
+  ])
+)(Q);
