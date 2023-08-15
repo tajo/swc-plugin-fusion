@@ -9,7 +9,6 @@ use swc_core::{
         },
     },
 };
-use tracing::debug;
 
 use super::State;
 
@@ -48,12 +47,8 @@ struct Analyzer<'a> {
 impl Visit for Analyzer<'_> {
     noop_visit_type!();
 
-    fn visit_var_declarator(&mut self, var_declarator: &VarDeclarator) {
-        debug!("use_translation_run: {:?}", var_declarator);
-        debug!("state: {:?}", self.state);
-    }
-
     fn visit_call_expr(&mut self, call_expr: &CallExpr) {
+        call_expr.visit_children_with(self);
         match &call_expr.callee {
             Callee::Expr(boxed_expr) => match &**boxed_expr {
                 Expr::Ident(ident) => {
