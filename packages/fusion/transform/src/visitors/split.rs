@@ -2,11 +2,12 @@ use std::rc::Rc;
 
 use percent_encoding::{utf8_percent_encode, AsciiSet, CONTROLS};
 use swc_core::{
-    common::{errors::HANDLER, FileName, DUMMY_SP},
+    common::{FileName, DUMMY_SP},
     ecma::{
         ast::*,
         visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
     },
+    plugin::errors::HANDLER,
 };
 use tracing::debug;
 
@@ -192,15 +193,21 @@ impl VisitMut for SplitVisitor {
                                 };
                             }
                             _ => HANDLER.with(|handler| {
-                                handler.err(&format!(
-                                    "Only string literal is supported in dynamic import"
-                                ));
+                                handler
+                                    .struct_span_err(
+                                        call_expr.span,
+                                        "Only string literal is supported in dynamic import",
+                                    )
+                                    .emit();
                             }),
                         },
                         _ => HANDLER.with(|handler| {
-                            handler.err(&format!(
-                                "Only string literal is supported in dynamic import"
-                            ));
+                            handler
+                                .struct_span_err(
+                                    call_expr.span,
+                                    "Only string literal is supported in dynamic import",
+                                )
+                                .emit();
                         }),
                     },
                 },

@@ -1,13 +1,13 @@
 use std::{cell::RefCell, collections::BTreeSet, rc::Rc};
 
 use swc_core::{
-    common::errors::HANDLER,
     ecma::{
         ast::*,
         visit::{
             as_folder, noop_visit_mut_type, noop_visit_type, Fold, Visit, VisitMut, VisitWith,
         },
     },
+    plugin::errors::HANDLER,
 };
 
 use super::State;
@@ -73,12 +73,15 @@ impl Visit for Analyzer<'_> {
                                             == ""
                                         {
                                             HANDLER.with(|handler| {
-                                                handler.err(&format!(
-                                                    "useTranslations template literal must be \
-                                                     hinted, e.g. \
-                                                     useTranslations(`hint.${{foo}}`) vs \
-                                                     useTranslatiosn(`${{foo}}`)."
-                                                ));
+                                                handler
+                                                    .struct_span_err(
+                                                        call_expr.span,
+                                                        "useTranslations template literal must be \
+                                                         hinted, e.g. \
+                                                         useTranslations(`hint.${{foo}}`) vs \
+                                                         useTranslations(`${{foo}}`)",
+                                                    )
+                                                    .emit();
                                             });
                                         }
                                         let mut tpl_parts: BTreeSet<String> = BTreeSet::new();
@@ -89,10 +92,13 @@ impl Visit for Analyzer<'_> {
                                         self.state.add_translation_id_tpl(tpl_parts);
                                     }
                                     _ => HANDLER.with(|handler| {
-                                        handler.err(&format!(
-                                            "useTranslations result function must be passed \
-                                             string literal or hinted template literal"
-                                        ));
+                                        handler
+                                            .struct_span_err(
+                                                call_expr.span,
+                                                "useTranslations result function must be passed a \
+                                                 string literal or hinted template literal",
+                                            )
+                                            .emit();
                                     }),
                                 },
                             },

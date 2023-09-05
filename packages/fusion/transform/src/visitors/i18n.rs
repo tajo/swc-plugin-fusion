@@ -52,7 +52,7 @@ impl VisitMut for I18nVisitor {
                         raw: None,
                     }),
                     type_only: Default::default(),
-                    asserts: Default::default(),
+                    with: Default::default(),
                 })),
             );
 

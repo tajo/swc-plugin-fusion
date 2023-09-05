@@ -3,10 +3,13 @@
 use std::path::PathBuf;
 
 use fusion::Config;
-use swc_common::{plugin::metadata::TransformPluginMetadataContextKind, FileName};
+use swc_common::FileName;
 use swc_core::{
     ecma::{ast::Program, visit::VisitMutWith},
-    plugin::{plugin_transform, proxies::TransformPluginProgramMetadata},
+    plugin::{
+        metadata::{TransformPluginMetadataContextKind, TransformPluginProgramMetadata},
+        plugin_transform,
+    },
 };
 
 #[plugin_transform]
