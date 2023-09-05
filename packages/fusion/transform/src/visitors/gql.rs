@@ -1,12 +1,13 @@
 use std::{cell::RefCell, collections::BTreeSet, rc::Rc};
 
 use swc_core::{
-    common::{errors::HANDLER, DUMMY_SP},
+    common::DUMMY_SP,
     ecma::{
         ast::*,
         utils::prepend_stmt,
         visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
     },
+    plugin::errors::HANDLER,
 };
 use tracing::{debug, span, Level};
 
@@ -50,7 +51,12 @@ impl GqlVisitor {
                                 self.to_prepend.insert(Thing { file_path: src_str });
                             }
                             _ => HANDLER.with(|handler| {
-                                handler.err(&format!("gql() argument must be a string literal"));
+                                handler
+                                    .struct_span_err(
+                                        call_expr.span,
+                                        "gql() argument must be a string literal",
+                                    )
+                                    .emit();
                             }),
                         }
                     }
@@ -85,7 +91,7 @@ impl VisitMut for GqlVisitor {
                         raw: None,
                     }),
                     type_only: Default::default(),
-                    asserts: Default::default(),
+                    with: Default::default(),
                 })),
             );
         }

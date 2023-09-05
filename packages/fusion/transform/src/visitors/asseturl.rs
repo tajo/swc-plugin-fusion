@@ -1,33 +1,15 @@
-use std::collections::BTreeSet;
-use std::{
-    cell::RefCell,
-    // path::Path,
-    rc::Rc,
-};
+use std::{cell::RefCell, collections::BTreeSet, rc::Rc};
 
 use swc_core::{
-    common::{errors::HANDLER, DUMMY_SP},
+    common::DUMMY_SP,
     ecma::{
         ast::*,
-        // atoms::JsWord,
         utils::prepend_stmt,
-        visit::{
-            as_folder,
-            // noop_fold_type,
-            noop_visit_mut_type,
-            Fold,
-            // FoldWith,
-            VisitMut,
-            VisitMutWith,
-        },
+        visit::{as_folder, noop_visit_mut_type, Fold, VisitMut, VisitMutWith},
     },
+    plugin::errors::HANDLER,
 };
-use tracing::{
-    debug,
-    span,
-    // trace,
-    Level,
-};
+use tracing::{debug, span, Level};
 
 use crate::{asseturl_utils::State, shared::converters::JsVarConverter};
 
@@ -70,7 +52,11 @@ impl AsseturlVisitor {
                             }
                             _ => HANDLER.with(|handler| {
                                 handler
-                                    .err(&format!("asseturl() argument must be a string literal"));
+                                    .struct_span_err(
+                                        call_expr.span,
+                                        "asseturl() argument must be a string literal",
+                                    )
+                                    .emit();
                             }),
                         }
                     }
@@ -108,7 +94,7 @@ impl VisitMut for AsseturlVisitor {
                         raw: None,
                     }),
                     type_only: Default::default(),
-                    asserts: Default::default(),
+                    with: Default::default(),
                 })),
             );
         }

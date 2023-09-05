@@ -80,8 +80,8 @@ const run = async () => {
             },
           },
         })
-      ).code;
-      result = await format(result, { parser: "babel" });
+      );
+      result = await format(result.code, { parser: "babel" });
 
       if (result != output) {
         console.log(`❌ Fixture ${fixtureName} failed.`);
@@ -111,4 +111,6 @@ const run = async () => {
   process.exit(0);
 };
 
-run();
+run().catch(e => {
+  console.log(e);
+});

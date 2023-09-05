@@ -1,13 +1,13 @@
 use std::{cell::RefCell, rc::Rc};
 
 use swc_core::{
-    common::errors::HANDLER,
     ecma::{
         ast::*,
         visit::{
             as_folder, noop_visit_mut_type, noop_visit_type, Fold, Visit, VisitMut, VisitWith,
         },
     },
+    plugin::errors::HANDLER,
 };
 use tracing::debug;
 
@@ -61,18 +61,24 @@ pub fn find_id_attribute(opening_element: &JSXOpeningElement) -> Option<String> 
                                             return Some(lit_str.value.as_ref().to_string());
                                         }
                                         _ => HANDLER.with(|handler| {
-                                            handler.err(&format!(
-                                                "The translate component must have props.id being \
-                                                 a string literal."
-                                            ));
+                                            handler
+                                                .struct_span_err(
+                                                    attr.span,
+                                                    "The translate component id prop must be a a \
+                                                     string literal.",
+                                                )
+                                                .emit();
                                         }),
                                     }
                                 }
                                 _ => HANDLER.with(|handler| {
-                                    handler.err(&format!(
-                                        "The translate component must have props.id being a \
-                                         string literal."
-                                    ));
+                                    handler
+                                        .struct_span_err(
+                                            attr.span,
+                                            "The translate component id prop must be a a string \
+                                             literal.",
+                                        )
+                                        .emit();
                                 }),
                             }
                         }
@@ -184,7 +190,7 @@ impl Visit for Analyzer<'_> {
 
     fn visit_call_expr(&mut self, call_expr: &CallExpr) {
         call_expr.visit_children_with(self);
-        let error_msg = "The withTranslations hoc must be called with an array of string literal \
+        let error_msg = "The withTranslations HoC must be called with an array of string literal \
                          translation keys.";
         match &call_expr.callee {
             Callee::Expr(boxed_expr) => match &**boxed_expr {
@@ -206,7 +212,9 @@ impl Visit for Analyzer<'_> {
                                                 );
                                             } else {
                                                 HANDLER.with(|handler| {
-                                                    handler.err(error_msg);
+                                                    handler
+                                                        .struct_span_err(call_expr.span, error_msg)
+                                                        .emit();
                                                 });
                                             }
                                         }
